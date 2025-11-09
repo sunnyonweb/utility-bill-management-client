@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer theme {
+  [data-theme="mytheme"] {
+    /* Base (light mode) */
+    --b1: #ffffff; /* base-100 */
+    --b2: #f9fafb; /* base-200 */
+    --b3: #e5e7eb; /* base-300 for card backgrounds */
+
+    /* Primary and Secondary Colors */
+    --p: #3b498f; /* primary */
+    --pc: #ffffff; /* primary-content */
+    --s: #06b6d4; /* secondary */
+    --sc: #ffffff; /* secondary-content */
+    
+    /* Neutral/Text Colors (Mapping custom names to DaisyUI neutrals) */
+    --n: #111827;  /* neutral (Primary Text Color) */
+    --nc: #ffffff; /* neutral-content */
+    --nf: #4b5563; /* Added: secondary text color using a custom variable, or can be used as neutral-focus */
+
+    /* State Colors (Highly recommended for toasts/errors) */
+    --su: #10b981; /* success */
+    --wa: #facc15; /* warning */
+    --er: #ef4444; /* error */
+    --in: #3b82f6; /* info */
+
+
+    /* Global Theme Overrides */
+    --rounded-btn: 0.5rem;
+    --btn-text-case: capitalize;
+    --animation-btn: 0.25s;
+    --font-family-sans: "Inter", sans-serif; 
+  }
+}
+
+
+html {
+  
+  font-family: "Inter", sans-serif; 
+  background-color: var(--b1); 
+  color: var(--n);
+}
+
