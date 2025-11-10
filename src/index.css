@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, abyss;
+}
 
 
 
@@ -42,9 +45,6 @@
 
 
 html {
-  
   font-family: "Inter", sans-serif; 
-  background-color: var(--b1); 
-  color: var(--n);
 }
 
