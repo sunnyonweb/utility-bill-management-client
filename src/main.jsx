@@ -5,28 +5,27 @@ import App from "./App.jsx";
 import AuthProvider from "./AuthProvider/AuthProvider.jsx";
 import { RouterProvider } from "react-router";
 import router from "./Routes/Routes.jsx";
-
 import { ToastContainer } from "react-toastify";
-
+import TokenWaiter from "./Component/TokenWaiter.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-  
-      <AuthProvider>
+    <AuthProvider>
+      <TokenWaiter>
         <RouterProvider router={router}></RouterProvider>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-      </AuthProvider>
-    
+      </TokenWaiter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+    </AuthProvider>
   </StrictMode>
 );

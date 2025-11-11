@@ -2,19 +2,23 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 import Loader from "../Component/Loader";
 import UpdateMyBillModal from "../Component/UpdateMyBillModal";
 import DeleteConfirmationModal from "../Component/DeleteConfirmationModal";
+import { generatePDF } from "../utils/pdfUtils"; // 🔑 Correct import for the utility function
 
 const MyPayBills = () => {
-  const { user, SERVER_BASE_URL } = useContext(AuthContext);
+  const {
+    user,
+    SERVER_BASE_URL,
+    loading: authLoading,
+  } = useContext(AuthContext);
+
   const [paidBills, setPaidBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [selectedBill, setSelectedBill] = useState(null); // For modals
+  const [selectedBill, setSelectedBill] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -23,14 +27,14 @@ const MyPayBills = () => {
   // --- Data Fetching ---
   const fetchUserBills = async () => {
     if (!userEmail) return;
-
     setLoading(true);
     try {
-      // Note: This endpoint is secured by verifyToken on the server
-      const res = await axios.get(`${SERVER_BASE_URL}/my-bills/${userEmail}`);
+      const res = await axios.get(`${SERVER_BASE_URL}/my-bills/${userEmail}`, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`, // <- include token
+        },
+      });
       setPaidBills(res.data);
-
-      // Calculate totals
       const amountSum = res.data.reduce(
         (sum, bill) => sum + (bill.amount || 0),
         0
@@ -38,94 +42,71 @@ const MyPayBills = () => {
       setTotalAmount(amountSum);
     } catch (error) {
       console.error("Error fetching paid bills:", error);
-      const msg = error.response?.data?.message || "Failed to load paid bills.";
-      toast.error(msg);
-      setTotalAmount(0); // Reset totals on error
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        toast.error("Session invalid. Please log out and log in again.");
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to load paid bills."
+        );
+      }
+      setTotalAmount(0);
     } finally {
       setLoading(false);
     }
   };
 
+  // 🔑 CRITICAL FIX: Synchronize Fetch with Auth Loading State
   useEffect(() => {
-    fetchUserBills();
-  }, [userEmail]); // Refetch when user changes
+    if (userEmail && !authLoading) {
+      fetchUserBills();
+    }
+  }, [userEmail, authLoading]);
 
   // --- CRUD Handlers ---
-
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${SERVER_BASE_URL}/my-bills/${id}`);
       toast.success("Bill record deleted successfully!");
       setIsDeleteModalOpen(false);
-      fetchUserBills(); // Refresh data
+      fetchUserBills();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete bill.");
     }
   };
 
-  // --- Challenge 1: Download PDF Report ---
+  // --- Download PDF Report  ---
   const downloadReport = () => {
     if (paidBills.length === 0) {
       return toast.warn("No bills to download.");
     }
-
-    const doc = new jsPDF();
-
-    // Header
-    doc.setFontSize(18);
-    doc.setTextColor("#06B6D4"); // Cyan color
-    doc.text("Utility Bill Payment History", 14, 20);
-
-    doc.setFontSize(10);
-    doc.setTextColor(50);
-    doc.text(`User: ${user.displayName || user.email}`, 14, 28);
-    doc.text(`Total Bills Paid: ${paidBills.length}`, 14, 34);
-    doc.text(`Total Amount Paid: ৳${totalAmount.toLocaleString()}`, 14, 40);
-
-    // Table setup
-    const tableColumn = [
-      "Username",
-      "Email",
-      "Amount (৳)",
-      "Address",
-      "Phone",
-      "Date",
-    ];
-    const tableRows = [];
-
-    paidBills.forEach((bill) => {
-      const billData = [
-        bill.username,
-        bill.email,
-        bill.amount.toLocaleString(),
-        bill.address,
-        bill.phone,
-        new Date(bill.date).toLocaleDateString(),
-      ];
-      tableRows.push(billData);
-    });
-
-    doc.autoTable(tableColumn, tableRows, { startY: 45 });
-    doc.save(`${userEmail}_BillReport.pdf`);
-    toast.info("PDF report downloaded.");
+    generatePDF(
+      paidBills,
+      user.displayName || "N/A",
+      user.email || "N/A",
+      totalAmount
+    );
   };
 
-  if (loading) {
+  const displayLoading = loading || authLoading;
+
+  if (displayLoading) {
     return <Loader />;
   }
 
   return (
     <div className="min-h-screen bg-base-100 dark:bg-base-200 py-10">
       <div className="container mx-auto px-4">
-        {/* Header and Totals */}
+        {/* Header and Totals (Required Display) */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-cyan-600 p-6 rounded-xl shadow-2xl mb-8 text-white">
           <h1 className="text-3xl font-extrabold">My Paid Bills</h1>
           <div className="text-right mt-4 md:mt-0">
             <p className="text-xl font-bold">
-              Total Bills Paid: {paidBills.length}
+              {" "}
+              Total Bills Paid: {paidBills.length}{" "}
             </p>
             <p className="text-2xl font-extrabold">
-              Total Amount: ৳{totalAmount.toLocaleString()}
+              {" "}
+              Total Amount: ৳{totalAmount.toLocaleString()}{" "}
             </p>
           </div>
         </div>
@@ -140,15 +121,15 @@ const MyPayBills = () => {
           </button>
         </div>
 
-        {/* Table Display */}
+        {/* Table Display (Required Layout) */}
         <div className="overflow-x-auto bg-base-100 dark:bg-base-300 rounded-xl shadow-lg border border-base-300">
           {paidBills.length === 0 ? (
             <p className="p-10 text-center text-xl text-base-content/70">
-              You have not paid any bills yet.
+              {" "}
+              You have not paid any bills yet.{" "}
             </p>
           ) : (
             <table className="table w-full">
-              {/* Head */}
               <thead>
                 <tr className="bg-base-200 dark:bg-base-200/50 text-base-content/80 text-sm">
                   <th>#</th>
@@ -167,11 +148,13 @@ const MyPayBills = () => {
                   >
                     <td>{index + 1}</td>
                     <td className="font-medium text-base-content">
-                      {bill.username}
+                      {" "}
+                      {bill.username}{" "}
                     </td>
                     <td className="text-sm">{bill.email}</td>
                     <td className="font-bold text-lg text-cyan-600">
-                      ৳{bill.amount.toLocaleString()}
+                      {" "}
+                      ৳{bill.amount.toLocaleString()}{" "}
                     </td>
                     <td>{new Date(bill.date).toLocaleDateString()}</td>
                     <td className="space-x-2">
@@ -183,7 +166,8 @@ const MyPayBills = () => {
                         }}
                         className="btn btn-sm bg-blue-500 text-white hover:bg-blue-600"
                       >
-                        Update
+                        {" "}
+                        Update{" "}
                       </button>
                       {/* Delete Button */}
                       <button
@@ -193,7 +177,8 @@ const MyPayBills = () => {
                         }}
                         className="btn btn-sm bg-red-500 text-white hover:bg-red-600"
                       >
-                        Delete
+                        {" "}
+                        Delete{" "}
                       </button>
                     </td>
                   </tr>
@@ -212,7 +197,6 @@ const MyPayBills = () => {
           onUpdate={fetchUserBills}
         />
       )}
-
       {isDeleteModalOpen && selectedBill && (
         <DeleteConfirmationModal
           bill={selectedBill}
