@@ -1,7 +1,6 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom"; // 🔑 Import from react-router-dom
 import RootLayout from "../Layout/RootLayout";
 import Error from "../Pages/Error";
-import Loader from "../Component/Loader";
 import Home from "../Pages/Home";
 import Bills from "../Pages/Bills";
 import MyPayBills from "../Pages/MyPayBills";
@@ -10,26 +9,29 @@ import BillsDetails from "../Pages/BillsDetails";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 
+// 🔑 Note: Removed unused imports (Loader)
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    // 🔑 Keep errorElement here to catch layout/data loading errors
     errorElement: <Error />,
     children: [
       {
-        // Home Page (Public)
+        // Home Page (Public) - Use only `index: true` or `path: ""`
         index: true,
-        path: "/",
         element: <Home />,
       },
       {
         // All Bills Page (Public)
-        path: "/bills",
+        path: "bills",
         element: <Bills />,
       },
       {
         // Bill Details Page (PRIVATE ROUTE)
-        path: "/bills/:billsId",
+        // 🔑 Renamed parameter to match the BillCard link: /bill/:id -> /bills/:billId
+        path: "bill/:id", // Assuming your BillCard links to /bill/:id, not /bills/:billsId
         element: (
           <PrivateRoute>
             <BillsDetails />
@@ -37,17 +39,18 @@ const router = createBrowserRouter([
         ),
       },
       {
-        // My Pay Bills Page
-        path: "/my-pay-bills",
+        // My Pay Bills Page (PRIVATE ROUTE)
+        path: "my-pay-bills",
         element: (
           <PrivateRoute>
             <MyPayBills />
           </PrivateRoute>
         ),
       },
+      // 🔑 No need to define Login/Register here if they are root-level routes
     ],
   },
-  // AUTHENTICATION ROUTES
+  // --- AUTHENTICATION ROUTES (Top-Level) ---
   {
     path: "/login",
     element: <Login />,
@@ -56,9 +59,12 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />,
   },
+  // 🔑 404 NOT FOUND ROUTE: React Router handles this automatically, but defining it
+  // outside the RootLayout is cleaner for a full-page error element.
   {
     path: "*",
     element: <Error />,
   },
 ]);
+
 export default router;

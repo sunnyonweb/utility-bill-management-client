@@ -1,34 +1,35 @@
 import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AuthContext } from "../AuthProvider/AuthProvider";
+
 import axios from "axios";
+import { AuthContext } from "../AuthProvider/AuthProvider";
 
 const Register = () => {
-  // Correctly using useContext to access context values
+  // 🔑 Access required functions from AuthContext
   const { createUser, updateUserProfile, googleSignIn, SERVER_BASE_URL } =
     useContext(AuthContext);
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  // 🔑 Helper to save user to MongoDB
   const saveUserAndNavigate = async (user, name, photo) => {
     const userToSave = {
       email: user.email,
       name: name || user.displayName,
       photo: photo || user.photoURL,
-      role: "user",
+      // Note: Your server's Firebase Admin SDK verifies this user on every request
     };
 
     try {
       await axios.post(`${SERVER_BASE_URL}/users`, userToSave);
-
       toast.success(
         `Registration successful! Welcome, ${userToSave.name || "User"}.`
       );
       navigate("/");
     } catch (dbError) {
-      console.error("DB Save/JWT Error:", dbError);
+      console.error("DB Save Error:", dbError);
       toast.warning(
         "Account created, but failed to synchronize profile data with the server."
       );
@@ -48,14 +49,12 @@ const Register = () => {
 
     let validationError = "";
 
-    // Validation checks
-    if (password.length < 6) {
+    if (password.length < 6)
       validationError = "Password length must be at least 6 characters.";
-    } else if (!/[A-Z]/.test(password)) {
+    else if (!/[A-Z]/.test(password))
       validationError = "Password must contain at least one uppercase letter.";
-    } else if (!/[a-z]/.test(password)) {
+    else if (!/[a-z]/.test(password))
       validationError = "Password must contain at least one lowercase letter.";
-    }
 
     if (validationError) {
       toast.error(validationError);
@@ -73,20 +72,16 @@ const Register = () => {
           .catch((error) => {
             console.error("Profile Update Error:", error);
             toast.warning(
-              "Registration successful, but profile picture/name update failed."
+              "Registration successful, but profile update failed."
             );
             saveUserAndNavigate(user, name, photo);
           });
       })
       .catch((error) => {
         console.error("Registration Error:", error.message);
-        const errorMessage = error.message;
-        let errorToDisplay = "Registration failed. Please try again.";
-
-        if (errorMessage.includes("email-already-in-use")) {
-          errorToDisplay = "This email address is already registered.";
-        }
-
+        let errorToDisplay = error.message.includes("email-already-in-use")
+          ? "This email address is already registered."
+          : "Registration failed. Please try again.";
         toast.error(errorToDisplay);
       })
       .finally(() => {
@@ -96,7 +91,6 @@ const Register = () => {
 
   const handleGoogleSignIn = () => {
     setLoading(true);
-
     googleSignIn()
       .then((result) => {
         const user = result.user;
@@ -113,6 +107,7 @@ const Register = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center py-12">
+      {/* ... (Your Register form JSX structure, which is clean and functional) ... */}
       <div className="w-full max-w-md mx-auto">
         <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
           <div className="text-center mb-6">
@@ -123,11 +118,9 @@ const Register = () => {
               Manage your utility bills easily.
             </p>
           </div>
-
-          {/* form */}
           <form onSubmit={handleRegister} className="space-y-4">
             <fieldset disabled={loading}>
-              {/* name */}
+              {/* Form Fields: Name, Photo URL, Email, Password */}
               <label className="block text-sm font-medium text-gray-700">
                 Name
               </label>
@@ -139,7 +132,6 @@ const Register = () => {
                 required
               />
 
-              {/* photo url */}
               <label className="block text-sm font-medium text-gray-700 mt-4">
                 Photo URL
               </label>
@@ -151,7 +143,6 @@ const Register = () => {
                 required
               />
 
-              {/* email */}
               <label className="block text-sm font-medium text-gray-700 mt-4">
                 Email
               </label>
@@ -163,7 +154,6 @@ const Register = () => {
                 required
               />
 
-              {/* password */}
               <label className="block text-sm font-medium text-gray-700 mt-4">
                 Password
               </label>
@@ -175,7 +165,7 @@ const Register = () => {
                 required
               />
 
-              {/* submit button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full mt-6 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition duration-150 ease-in-out disabled:opacity-50"
@@ -190,7 +180,7 @@ const Register = () => {
                 <div className="h-px flex-grow bg-gray-300"></div>
               </div>
 
-              {/* google signup */}
+              {/* Google Social Login */}
               <button
                 onClick={handleGoogleSignIn}
                 className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 transition duration-150 ease-in-out disabled:opacity-50"

@@ -7,29 +7,28 @@ import {
   signInWithPopup,
   signOut,
   onAuthStateChanged,
-  updateProfile, // 🔑 Import updateProfile for registration
+  updateProfile,
 } from "firebase/auth";
 import app from "../Firebase/Firebase.config";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 export const AuthContext = createContext(null);
 
-// ⚠️ IMPORTANT: Set your Server Base URL here for easy maintenance
-const SERVER_BASE_URL = "http://localhost:5000"; // Change to your Vercel URL upon deployment
+// ✅ Port is correctly set to 4000
+const SERVER_BASE_URL = "http://localhost:4000";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 1. Create User
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  // 2. Update User Profile (for Register page)
   const updateUserProfile = (name, photoURL) => {
     return updateProfile(auth.currentUser, {
       displayName: name,
@@ -37,78 +36,72 @@ const AuthProvider = ({ children }) => {
     });
   };
 
-  // 3. Login
   const signIn = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  // 4. Logout
   const logOut = () => {
-    // Clear token and sign out (ensures PrivateRoute correctly sees user as null)
     localStorage.removeItem("utility-token");
-    setLoading(true); // Set loading to true while Firebase logs out
+    setLoading(true);
     return signOut(auth);
   };
 
-  // 5. Google Sign In
   const googleSignIn = () => {
     setLoading(true);
     return signInWithPopup(auth, googleProvider);
   };
 
-  // 6. JWT Fetch Logic (Helper function)
-  const fetchAndSetToken = (currentUser) => {
-    if (currentUser) {
-      // Use Axios to call your JWT endpoint
-      axios
-        .post(`${SERVER_BASE_URL}/jwt`, { email: currentUser.email })
-        .then((res) => {
-          if (res.data.token) {
-            localStorage.setItem("utility-token", res.data.token);
-          }
-        })
-        .catch((error) => {
-          console.error("JWT fetch error:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      // No user found, finish loading state.
+  // 🔑 Function to fetch and set the Custom JWT
+  const fetchAndSetToken = async (currentUser) => {
+    if (!currentUser.email) {
       setLoading(false);
+      return;
     }
+
+    try {
+      // Calls the server's /jwt endpoint to get the custom token
+      const res = await axios.post(`${SERVER_BASE_URL}/jwt`, {
+        email: currentUser.email,
+      });
+      if (res.data.token) {
+        // Save the custom JWT token signed by your server
+        localStorage.setItem("utility-token", res.data.token);
+      }
+    } catch (error) {
+      console.error("JWT fetch error:", error);
+      toast.error("Failed to secure session. Please try logging in again.");
+    }
+    setLoading(false);
   };
 
-  // 7. State Observer (Handles persistence and token)
+  // 🔑 State Observer (Handles login, registration, and refresh)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
 
       if (currentUser) {
-        // User is present, fetch their token
+        // User logged in: fetch the custom JWT
         fetchAndSetToken(currentUser);
       } else {
-        // User is null (logged out or initially null), clear token if present
+        // User logged out
         localStorage.removeItem("utility-token");
-        setLoading(false); // Can set loading false immediately if no token fetch is needed
+        setLoading(false);
       }
     });
-
-    return () => {
-      return unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
-  // 8. 🔑 Axios Interceptor (Optional but crucial for securing backend API calls)
+  // 🔑 CORRECTED AXIOS INTERCEPTOR: Reads the token synchronously inside the function
   useEffect(() => {
-    const token = localStorage.getItem("utility-token");
-
-    // The interceptor runs before every Axios request
     const requestInterceptor = axios.interceptors.request.use(
       (config) => {
+        // ✅ FIX: Read the token *synchronously* here to get the LATEST value
+        // every time a request is made.
+        const token = localStorage.getItem("utility-token");
+
         if (token) {
-          // Attach the token to the Authorization header
+          // Header format must be correct for JWT verification
           config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -117,22 +110,21 @@ const AuthProvider = ({ children }) => {
         return Promise.reject(error);
       }
     );
-
-    // Clean up the interceptor when the component unmounts or dependencies change
     return () => {
+      // Clean up the interceptor when the component unmounts
       axios.interceptors.request.eject(requestInterceptor);
     };
-  }, [user, loading]); // Rerun if user or loading changes, ensuring token is checked
+  }, [user, loading]);
 
   const authData = {
     user,
     createUser,
-    updateUserProfile, // 🔑 Added profile update
+    updateUserProfile,
     signIn,
     logOut,
     loading,
     googleSignIn,
-    SERVER_BASE_URL, // 🔑 Added BASE_URL for other components
+    SERVER_BASE_URL,
   };
 
   return (

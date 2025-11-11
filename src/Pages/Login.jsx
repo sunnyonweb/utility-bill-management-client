@@ -1,30 +1,28 @@
 import React, { useContext, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import axios from "axios"; // 🔑 Need axios for the MERN JWT process
+
+import axios from "axios";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 
 const Login = () => {
-  // 🔑 Access required functions and base URL from AuthContext
   const { signIn, googleSignIn, SERVER_BASE_URL } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
 
-  // Determine where to redirect after successful login
   const from = location.state?.from?.pathname || "/";
 
-  // 🔑 Helper to save user (if first time login via Google) and rely on AuthProvider to fetch JWT
+  // 🔑 Helper to save user (if first time login via Google) to MongoDB
   const saveUserAndNavigate = async (user) => {
     const userToSave = {
       email: user.email,
       name: user.displayName,
       photo: user.photoURL,
-      role: "user",
     };
 
     try {
-      // POST user data to MongoDB (The backend handles checking if the user already exists)
+      // Synchronize with MongoDB /users endpoint
       await axios.post(`${SERVER_BASE_URL}/users`, userToSave);
 
       toast.success(
@@ -32,7 +30,7 @@ const Login = () => {
       );
       navigate(from, { replace: true });
     } catch (dbError) {
-      console.error("DB Sync/JWT Error:", dbError);
+      console.error("DB Sync Error:", dbError);
       toast.warning(
         "Login successful, but failed to synchronize data with the server."
       );
@@ -40,7 +38,6 @@ const Login = () => {
     }
   };
 
-  // --- 1. Email/Password Login Handler ---
   const handleLogin = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -51,23 +48,20 @@ const Login = () => {
 
     signIn(email, password)
       .then((result) => {
-        // If sign-in is successful, the AuthProvider's useEffect handles the JWT fetching
-        const user = result.user;
+        // AuthProvider handles token generation via onAuthStateChanged
         toast.success(`Login successful! Redirecting...`);
         navigate(from, { replace: true });
       })
       .catch((error) => {
         console.error("Login Error:", error.message);
-        const errorMessage = error.message;
         let errorToDisplay = "Login failed. Please check your credentials.";
 
-        if (errorMessage.includes("user-not-found")) {
+        if (error.message.includes("user-not-found")) {
           errorToDisplay = "No account found with this email.";
-        } else if (errorMessage.includes("wrong-password")) {
+        } else if (error.message.includes("wrong-password")) {
           errorToDisplay = "Invalid password. Please try again.";
         }
 
-        // Show error using toast
         toast.error(errorToDisplay);
       })
       .finally(() => {
@@ -75,14 +69,13 @@ const Login = () => {
       });
   };
 
-  // --- 2. Google Sign-In Handler ---
   const handleGoogleSignIn = () => {
     setLoading(true);
 
     googleSignIn()
       .then((result) => {
         const user = result.user;
-        // If successful, save/sync user data to MongoDB and navigate
+        // Sync user data to MongoDB and navigate
         saveUserAndNavigate(user);
       })
       .catch((error) => {
@@ -96,10 +89,10 @@ const Login = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center py-12">
+      {/* ... (Your Login form JSX structure) ... */}
       <div className="w-full max-w-md mx-auto">
         <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
           <div className="text-center mb-6">
-            {/* Title: Login */}
             <h1 className="text-4xl font-extrabold text-gray-800">
               User Login
             </h1>
@@ -108,7 +101,6 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <fieldset disabled={loading}>
               {/* Email */}
@@ -135,9 +127,7 @@ const Login = () => {
                 required
               />
 
-              {/* Forget Password Link */}
               <div className="text-sm text-right">
-                {/* 🚫 Note: Forget Password logic is NOT implemented as per assignment rules, so this link is placeholder */}
                 <a
                   href="#"
                   className="font-medium text-cyan-600 hover:text-cyan-700"
@@ -178,7 +168,6 @@ const Login = () => {
             </fieldset>
           </form>
 
-          {/* Register Link */}
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link

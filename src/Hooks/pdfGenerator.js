@@ -1,48 +1,47 @@
-// client/src/utils/pdfGenerator.js
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
-const generateMyBillsReport = (bills, userEmail, totalAmount, totalBills) => {
-    const doc = new jsPDF();
+export const generatePDF = (bills) => {
+  if (!bills || bills.length === 0) {
+    alert("No bills to generate PDF!");
+    return;
+  }
 
-    // --- Header and Metadata ---
-    doc.setFontSize(18);
-    doc.text('Utility Bill Payment History Report', 14, 22);
+  const doc = new jsPDF();
 
-    doc.setFontSize(11);
-    doc.text(`User Email: ${userEmail}`, 14, 32);
-    doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 37);
+  // Add title
+  doc.setFontSize(18);
+  doc.text("My Paid Bills Report", 14, 22);
 
-    // --- Totals Summary ---
+  // Optional: add email if available
+  if (bills[0].email) {
     doc.setFontSize(12);
-    doc.setTextColor(59, 73, 143); // Primary color
-    doc.text(`Total Bills Paid: ${totalBills}`, 14, 47);
-    doc.text(`Total Amount Spent: ৳${totalAmount.toLocaleString()}`, 14, 52);
-    doc.setTextColor(0, 0, 0); // Reset text color
+    doc.text(`Email: ${bills[0].email}`, 14, 30);
+  }
 
-    // --- Prepare Table Data ---
-    const tableColumn = ["Username", "Email", "Amount (৳)", "Address", "Phone", "Date Paid"];
-    const tableRows = bills.map(bill => [
-        bill.username,
-        bill.email,
-        bill.amount,
-        bill.address,
-        bill.phone,
-        new Date(bill.date).toLocaleDateString(),
+  // Table headers and rows
+  const tableColumn = ["Category", "Amount", "Date"];
+  const tableRows = [];
+
+  let totalAmount = 0;
+
+  bills.forEach((bill) => {
+    tableRows.push([
+      bill.category,
+      bill.amount,
+      new Date(bill.date).toLocaleDateString(),
     ]);
+    totalAmount += bill.amount;
+  });
 
-    // --- AutoTable Generation ---
-    doc.autoTable({
-        startY: 60, // Start table below the summary
-        head: [tableColumn],
-        body: tableRows,
-        theme: 'striped',
-        headStyles: { fillColor: [59, 73, 143] }, // Use your primary color
-        margin: { top: 10 }
-    });
+  doc.autoTable({
+    head: [tableColumn],
+    body: tableRows,
+    startY: 40,
+  });
 
-    // --- Save the PDF ---
-    doc.save(`Utility_Report_${userEmail.split('@')[0]}_${new Date().getFullYear()}.pdf`);
+  doc.text(`Total Amount Paid: $${totalAmount}`, 14, doc.lastAutoTable.finalY + 10);
+
+  // Save PDF
+  doc.save("my_bills_report.pdf");
 };
-
-export default generateMyBillsReport;
