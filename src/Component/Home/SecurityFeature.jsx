@@ -1,6 +1,6 @@
 import React from "react";
-import { Slide } from "react-awesome-reveal"; // 🔑 Import Slide for animation
-import { Zap, Shield, Phone } from "lucide-react"; // Lucide icons for clean design
+import { Slide } from "react-awesome-reveal";
+import { Zap, Shield, Phone } from "lucide-react";
 
 const SecurityFeature = () => {
   return (
@@ -11,11 +11,10 @@ const SecurityFeature = () => {
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Extra Section 1: Security Feature (Left Slide) */}
+          {/*  Security Feature  */}
           <Slide direction="left" triggerOnce>
             <div className="p-8 bg-base-100 dark:bg-base-300 rounded-xl shadow-2xl border-l-4 border-teal-500 hover:shadow-teal-500/30 transition duration-300 transform hover:scale-[1.01]">
               <div className="flex items-center mb-4">
-                {/* Enhanced Icon/Accent Block */}
                 <div className="p-3 bg-teal-500 rounded-full mr-4 shadow-lg shadow-teal-500/40">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
@@ -36,11 +35,10 @@ const SecurityFeature = () => {
             </div>
           </Slide>
 
-          {/* Extra Section 2: Contact/Support (Right Slide) */}
+          {/* Contact/Support  */}
           <Slide direction="right" triggerOnce>
             <div className="p-8 bg-base-100 dark:bg-base-300 rounded-xl shadow-2xl border-l-4 border-cyan-500 hover:shadow-cyan-500/30 transition duration-300 transform hover:scale-[1.01]">
               <div className="flex items-center mb-4">
-                {/* Enhanced Icon/Accent Block */}
                 <div className="p-3 bg-cyan-600 rounded-full mr-4 shadow-lg shadow-cyan-600/40">
                   <Phone className="w-6 h-6 text-white" />
                 </div>

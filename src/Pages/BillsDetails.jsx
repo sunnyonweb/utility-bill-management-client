@@ -18,34 +18,30 @@ const BillDetails = () => {
 
   // --- Data Fetching ---
   useEffect(() => {
-    // Since this is a PrivateRoute, user should exist, but we check anyway.
     if (!user || !id) {
       setLoading(false);
       return;
     }
 
     setLoading(true);
-    // Note: The Axios Interceptor in AuthProvider automatically sends the token (Firebase ID Token)
     axios
       .get(`${SERVER_BASE_URL}/bills/${id}`)
       .then((res) => {
         const fetchedBill = res.data;
         setBill(fetchedBill);
 
-        // 🔑 CRITICAL LOGIC: Check if the bill date is in the current month
         checkCurrentMonth(fetchedBill.date);
       })
       .catch((error) => {
         console.error("Error fetching bill details:", error);
         toast.error("Failed to load bill details.");
-        navigate("/bills"); // Redirect if details fail to load
+        navigate("/bills");
       })
       .finally(() => {
         setLoading(false);
       });
   }, [id, user, SERVER_BASE_URL, navigate]);
 
-  // 🔑 CRITICAL FUNCTION: Checks if the bill's date matches the current month/year
   const checkCurrentMonth = (billDateString) => {
     if (!billDateString) return setIsCurrentMonth(false);
 
@@ -53,12 +49,10 @@ const BillDetails = () => {
     const currentDate = new Date();
 
     const sameYear = billDate.getFullYear() === currentDate.getFullYear();
-    const sameMonth = billDate.getMonth() === currentDate.getMonth(); // Month is 0-indexed
+    const sameMonth = billDate.getMonth() === currentDate.getMonth();
 
     setIsCurrentMonth(sameYear && sameMonth);
   };
-
-  // --- JSX Rendering ---
 
   if (loading) return <Loader />;
   if (!bill)

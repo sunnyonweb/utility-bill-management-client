@@ -5,21 +5,19 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 
-const Register = () => {
-  // 🔑 Access required functions from AuthContext
+const Login = () => {
   const { createUser, updateUserProfile, googleSignIn, SERVER_BASE_URL } =
     useContext(AuthContext);
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // 🔑 Helper to save user to MongoDB
+  //  Helper to save user to MongoDB
   const saveUserAndNavigate = async (user, name, photo) => {
     const userToSave = {
       email: user.email,
       name: name || user.displayName,
       photo: photo || user.photoURL,
-      // Note: Your server's Firebase Admin SDK verifies this user on every request
     };
 
     try {
@@ -107,7 +105,6 @@ const Register = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center py-12">
-      {/* ... (Your Register form JSX structure, which is clean and functional) ... */}
       <div className="w-full max-w-md mx-auto">
         <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
           <div className="text-center mb-6">
@@ -120,7 +117,6 @@ const Register = () => {
           </div>
           <form onSubmit={handleRegister} className="space-y-4">
             <fieldset disabled={loading}>
-              {/* Form Fields: Name, Photo URL, Email, Password */}
               <label className="block text-sm font-medium text-gray-700">
                 Name
               </label>
@@ -180,7 +176,7 @@ const Register = () => {
                 <div className="h-px flex-grow bg-gray-300"></div>
               </div>
 
-              {/* Google Social Login */}
+              {/* Google Login */}
               <button
                 onClick={handleGoogleSignIn}
                 className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 transition duration-150 ease-in-out disabled:opacity-50"
@@ -212,4 +208,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Zap } from "lucide-react"; // Lucide icons for clean design
+import { Mail, Phone, MapPin, Zap } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -9,7 +9,6 @@ const Footer = () => {
     <footer className="bg-base-200 dark:bg-base-300 border-t border-base-300 dark:border-base-content/10 mt-16">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* 1. Logo / Site Name & Short Description (Assignment Requirement) */}
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link
               to="/"
@@ -26,7 +25,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* 2. Useful Links (Assignment Requirement) */}
           <div>
             <h3 className="text-lg font-semibold text-base-content mb-4 border-b-2 border-cyan-600/50 inline-block">
               Quick Links
@@ -58,7 +56,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* 3. Legal & Resources (Standard Footer Content) */}
           <div>
             <h3 className="text-lg font-semibold text-base-content mb-4 border-b-2 border-cyan-600/50 inline-block">
               Resources
@@ -82,7 +79,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* 4. Contact Information (Enhancement) */}
           <div>
             <h3 className="text-lg font-semibold text-base-content mb-4 border-b-2 border-cyan-600/50 inline-block">
               Contact
@@ -105,7 +101,6 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Copyright Section (Assignment Requirement) */}
       <div className="border-t border-base-300 dark:border-base-content/10 py-4">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-base-content/60">

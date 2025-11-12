@@ -5,7 +5,7 @@ import { AuthContext } from "../AuthProvider/AuthProvider";
 import Loader from "../Component/Loader";
 import BillCard from "../Component/Home/BillCard";
 
-// --- New Bills Page Hero Component ---
+// --- New Bills  ---
 const BillsHero = () => (
   <div className="py-16 px-4 mb-8 bg-base-300 dark:bg-base-300/70 rounded-xl shadow-lg border-l-4 border-cyan-600 transition duration-300">
     <div className="max-w-4xl mx-auto text-center">
@@ -19,7 +19,6 @@ const BillsHero = () => (
     </div>
   </div>
 );
-// --- End Hero Component ---
 
 const Bills = () => {
   const { SERVER_BASE_URL } = useContext(AuthContext);
@@ -60,10 +59,9 @@ const Bills = () => {
   return (
     <div className="min-h-screen bg-base-100 dark:bg-base-200 py-10">
       <div className="container mx-auto px-4">
-        {/* 🔑 Hero Section Integration */}
+        {/*  Hero Section  */}
         <BillsHero />
 
-        {/* --- Filtering Control --- */}
         <div className="flex flex-col md:flex-row items-center justify-center bg-base-300 dark:bg-base-300/50 p-4 rounded-lg shadow-md mb-8 max-w-lg mx-auto">
           <label
             htmlFor="category-filter"

@@ -1,4 +1,4 @@
-// pdfUtils.js
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable"; 
 export const generatePDF = (bills, userName, userEmail, totalAmount) => {

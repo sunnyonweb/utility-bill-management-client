@@ -6,7 +6,7 @@ import { AuthContext } from "../AuthProvider/AuthProvider";
 import Loader from "../Component/Loader";
 import UpdateMyBillModal from "../Component/UpdateMyBillModal";
 import DeleteConfirmationModal from "../Component/DeleteConfirmationModal";
-import { generatePDF } from "../utils/pdfUtils"; // 🔑 Correct import for the utility function
+import { generatePDF } from "../utils/pdfUtils";
 
 const MyPayBills = () => {
   const {
@@ -31,7 +31,7 @@ const MyPayBills = () => {
     try {
       const res = await axios.get(`${SERVER_BASE_URL}/my-bills/${userEmail}`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`, // <- include token
+          Authorization: `Bearer ${user?.token}`, // include token
         },
       });
       setPaidBills(res.data);
@@ -55,14 +55,13 @@ const MyPayBills = () => {
     }
   };
 
-  // 🔑 CRITICAL FIX: Synchronize Fetch with Auth Loading State
   useEffect(() => {
     if (userEmail && !authLoading) {
       fetchUserBills();
     }
   }, [userEmail, authLoading]);
 
-  // --- CRUD Handlers ---
+  // --- CRUD  ---
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${SERVER_BASE_URL}/my-bills/${id}`);
@@ -96,7 +95,7 @@ const MyPayBills = () => {
   return (
     <div className="min-h-screen bg-base-100 dark:bg-base-200 py-10">
       <div className="container mx-auto px-4">
-        {/* Header and Totals (Required Display) */}
+        {/* Header  */}
         <div className="flex flex-col md:flex-row justify-between items-center bg-cyan-600 p-6 rounded-xl shadow-2xl mb-8 text-white">
           <h1 className="text-3xl font-extrabold">My Paid Bills</h1>
           <div className="text-right mt-4 md:mt-0">
@@ -121,7 +120,7 @@ const MyPayBills = () => {
           </button>
         </div>
 
-        {/* Table Display (Required Layout) */}
+        {/* Table Display  */}
         <div className="overflow-x-auto bg-base-100 dark:bg-base-300 rounded-xl shadow-lg border border-base-300">
           {paidBills.length === 0 ? (
             <p className="p-10 text-center text-xl text-base-content/70">

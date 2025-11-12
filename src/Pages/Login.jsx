@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 
-const Login = () => {
+const Register = () => {
   const { signIn, googleSignIn, SERVER_BASE_URL } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -13,7 +13,6 @@ const Login = () => {
 
   const from = location.state?.from?.pathname || "/";
 
-  // 🔑 Helper to save user (if first time login via Google) to MongoDB
   const saveUserAndNavigate = async (user) => {
     const userToSave = {
       email: user.email,
@@ -22,7 +21,6 @@ const Login = () => {
     };
 
     try {
-      // Synchronize with MongoDB /users endpoint
       await axios.post(`${SERVER_BASE_URL}/users`, userToSave);
 
       toast.success(
@@ -48,7 +46,6 @@ const Login = () => {
 
     signIn(email, password)
       .then((result) => {
-        // AuthProvider handles token generation via onAuthStateChanged
         toast.success(`Login successful! Redirecting...`);
         navigate(from, { replace: true });
       })
@@ -75,7 +72,7 @@ const Login = () => {
     googleSignIn()
       .then((result) => {
         const user = result.user;
-        // Sync user data to MongoDB and navigate
+
         saveUserAndNavigate(user);
       })
       .catch((error) => {
@@ -89,7 +86,6 @@ const Login = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center py-12">
-      {/* ... (Your Login form JSX structure) ... */}
       <div className="w-full max-w-md mx-auto">
         <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
           <div className="text-center mb-6">
@@ -151,7 +147,7 @@ const Login = () => {
                 <div className="h-px flex-grow bg-gray-300"></div>
               </div>
 
-              {/* Google Social Login */}
+              {/* Google Login */}
               <button
                 onClick={handleGoogleSignIn}
                 className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 transition duration-150 ease-in-out disabled:opacity-50"
@@ -183,4 +179,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
