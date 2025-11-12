@@ -11,10 +11,10 @@ const Home = () => {
     <div className="min-h-screen bg-base-100 dark:bg-base-200">
       <div className="container mx-auto px-4 py-8 space-y-16">
         <BannerSection></BannerSection>
-        <CategorySection></CategorySection>
-        <Financial></Financial>
         <HighlightsSection></HighlightsSection>
+        <CategorySection></CategorySection>
         <RecentBillsSection></RecentBillsSection>
+        <Financial></Financial>
         <SecurityFeature></SecurityFeature>
       </div>
     </div>

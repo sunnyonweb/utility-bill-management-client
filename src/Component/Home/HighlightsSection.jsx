@@ -1,5 +1,4 @@
 import React from "react";
-// 🔑 Imported React Awesome Reveal for dynamic animation
 import { Fade, Slide } from "react-awesome-reveal";
 import { CheckCircle, Zap, Shield, FileText } from "lucide-react";
 
@@ -49,7 +48,6 @@ const HighlightsSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
           {features.map((feature, index) => (
-            // 🔑 Reveal component adds animation on scroll
             <Slide
               key={index}
               direction={index % 2 === 0 ? "left" : "right"}
@@ -57,14 +55,12 @@ const HighlightsSection = () => {
               delay={index * 150}
             >
               <div className="group flex items-start space-x-6 p-6 bg-base-100 rounded-xl shadow-xl hover:shadow-2xl hover:shadow-cyan-400/30 border border-base-300 dark:border-base-content/20 transition duration-300">
-                {/* Icon Container with Color Accent */}
                 <div
                   className={`flex-shrink-0 p-3 rounded-full ${feature.color} shadow-lg shadow-gray-500/30 group-hover:shadow-cyan-500/50 transition duration-300`}
                 >
                   {feature.icon}
                 </div>
 
-                {/* Text Content */}
                 <div>
                   <h3 className="text-2xl font-bold text-base-content mb-2">
                     {feature.title}
