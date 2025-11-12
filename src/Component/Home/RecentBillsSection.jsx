@@ -43,7 +43,7 @@ const RecentBillsSection = () => {
     if (retryCount === 0) {
       fetchBills();
     } else {
-      // Wait 3 seconds before retrying
+      
       const timer = setTimeout(fetchBills, 3000);
       return () => clearTimeout(timer);
     }

@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 
 const DeleteConfirmationModal = ({ bill, onClose, onConfirmDelete }) => {
   const [loading, setLoading] = useState(false);
 
   const handleDelete = () => {
     setLoading(true);
-    // Call the parent function (which handles the API call and refresh)
+
     onConfirmDelete();
-    // Note: The loading state is managed by the parent component's state upon resolution/rejection
   };
 
   return (
@@ -36,7 +34,7 @@ const DeleteConfirmationModal = ({ bill, onClose, onConfirmDelete }) => {
           This action cannot be undone.
         </p>
 
-        {/* Action Buttons */}
+        {/*  Buttons */}
         <div className="modal-action flex justify-end gap-3">
           <button
             type="button"

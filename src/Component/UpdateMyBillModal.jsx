@@ -7,12 +7,12 @@ const UpdateMyBillModal = ({ bill, onClose, onUpdate }) => {
   const { SERVER_BASE_URL, user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
-  // 🔑 State initialized with current bill data for auto-fill
+  //  with current bill data
   const [formData, setFormData] = useState({
     amount: bill.amount || "",
     address: bill.address || "",
     phone: bill.phone || "",
-    // Format date to YYYY-MM-DD for input type="date" compatibility
+
     date: bill.date ? new Date(bill.date).toISOString().split("T")[0] : "",
   });
 
@@ -27,11 +27,10 @@ const UpdateMyBillModal = ({ bill, onClose, onUpdate }) => {
     e.preventDefault();
     setLoading(true);
 
-    // Include the user's email for the security check on the server (Route 7)
     const updateData = {
       ...formData,
       email: user.email,
-      amount: parseFloat(formData.amount), // Ensure amount is a number
+      amount: parseFloat(formData.amount),
     };
 
     axios
@@ -40,7 +39,7 @@ const UpdateMyBillModal = ({ bill, onClose, onUpdate }) => {
         toast.success(`Bill record updated successfully!`, {
           position: "top-center",
         });
-        onUpdate(); // Refresh the list of paid bills on the main page
+        onUpdate();
         onClose();
       })
       .catch((error) => {
@@ -131,7 +130,7 @@ const UpdateMyBillModal = ({ bill, onClose, onUpdate }) => {
               />
             </label>
 
-            {/* Action Buttons */}
+            {/*  Buttons */}
             <div className="modal-action mt-6 flex justify-end gap-3">
               <button
                 type="button"
