@@ -1,6 +1,6 @@
 # ⚡ BillManager Pro: MERN Stack Utility Bill Management System
 
-[![Live Site URL]()]
+[![Live Site URL](https://utility-bill-management-c718d.web.app/)]
 
 ---
 
@@ -65,4 +65,4 @@
     npm run dev
     ```
 
-The client application will typically open on `http://localhost:5173` and communicate with the server at `http://localhost:4000`.
+The client application will typically open on `http://localhost:5173` and communicate with the server at `https://utility-bill-management-sable.vercel.app/`.

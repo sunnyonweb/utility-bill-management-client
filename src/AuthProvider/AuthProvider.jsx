@@ -17,7 +17,7 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 export const AuthContext = createContext(null);
 
-const SERVER_BASE_URL = "http://localhost:4000";
+const SERVER_BASE_URL = "https://utility-bill-management-sable.vercel.app";
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

@@ -220,7 +220,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/register"
-                className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition duration-150 ease-in-out font-medium"
+                className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition duration-150 ease-in-out font-medium hidden md:inline-block"
               >
                 Register
               </Link>
